@@ -1,0 +1,78 @@
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum, Float
+from sqlalchemy.orm import relationship
+from datetime import datetime
+import enum
+from .database import Base
+
+# -------------------
+# ENUMS
+# -------------------
+class RoleEnum(str, enum.Enum):
+    client = "client"
+    freelancer = "freelancer"
+
+class ContractStatus(str, enum.Enum):
+    pending = "pending"
+    in_progress = "in_progress"
+    completed = "completed"
+    cancelled = "cancelled"
+
+# -------------------
+# USERS
+# -------------------
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    role = Column(Enum(RoleEnum), default=RoleEnum.client)
+
+    services = relationship("Service", back_populates="owner", cascade="all, delete-orphan")
+    contracts_as_client = relationship("Contract", back_populates="client", foreign_keys="Contract.client_id")
+    contracts_as_freelancer = relationship("Contract", back_populates="freelancer", foreign_keys="Contract.freelancer_id")
+
+# -------------------
+# SERVICES
+# -------------------
+class Service(Base):
+    __tablename__ = "services"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, index=True, nullable=False)
+    description = Column(String, nullable=False)
+    owner_id = Column(Integer, ForeignKey("users.id"))
+
+    owner = relationship("User", back_populates="services")
+    contracts = relationship("Contract", back_populates="service", cascade="all, delete-orphan")
+
+# -------------------
+# CONTRACTS
+# -------------------
+class Contract(Base):
+    __tablename__ = "contracts"
+    id = Column(Integer, primary_key=True, index=True)
+    client_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    freelancer_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    service_id = Column(Integer, ForeignKey("services.id"), nullable=False)
+    status = Column(Enum(ContractStatus), default=ContractStatus.pending)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    rating = Column(Float, nullable=True)  # Avaliação do freelancer (1-5)
+    review = Column(String, nullable=True) # Comentário opcional
+
+    client = relationship("User", back_populates="contracts_as_client", foreign_keys=[client_id])
+    freelancer = relationship("User", back_populates="contracts_as_freelancer", foreign_keys=[freelancer_id])
+    service = relationship("Service", back_populates="contracts")
+    messages = relationship("Message", back_populates="contract", cascade="all, delete-orphan")
+
+# -------------------
+# MESSAGES
+# -------------------
+class Message(Base):
+    __tablename__ = "messages"
+    id = Column(Integer, primary_key=True, index=True)
+    contract_id = Column(Integer, ForeignKey("contracts.id"), nullable=False)
+    sender_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    text = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    contract = relationship("Contract", back_populates="messages")
+    sender = relationship("User")

@@ -1,0 +1,45 @@
+OQUE TEMOS:
+
+Funcionalidades imPlementadas
+
+Usuários:
+- Cadastro de usuários (post/users/)
+- Listagem de usuário (GET /users/)
+- Cada usuário possui:
+- email
+- password
+- role -> cliente ou freelancer
+
+
+Autenticação (JWT)
+
+- End point de login (POST /token) na rota auth_routes 
+- geração de token  JWT com validade de 60 minutos
+- autenticação de dois fatores (OAuth2)
+- Endpoint protegido via Depends (Auth.get_current_users) para operações que precisam do usuário logado
+
+
+Serviços
+
+- Endpoint de criação de serviço
+- SOMENTE freelancers podem criar serviços
+- Campos: título e descrição 
+- Endpoint de listagem de servições (Qualquer usuário pode visualizar isso
+
+
+
+Banco de dados
+
+- SQLite (maoki.db)
+- Tabelas:
+- -users > armazena e-mail, senha e rol
+- -services > Armazena título, descrição e dono (owner_ id)
+- criação automática das tabelas na inicialização do app
+
+
+Segurança do maoki
+
+- Senhas criotografadas com bcrypt
+- Tokens JWT com python-jose
+- Verificação de role antes de criar serviços 
+- Endpoints protegidos para operações sensíveis

@@ -1,0 +1,16 @@
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from typing import List
+from .. import schemas, crud, models, database, auth
+
+router = APIRouter(prefix="/services", tags=["services"])
+
+@router.post("/", response_model=schemas.ServiceResponse)
+def create_service(service: schemas.ServiceCreate, db: Session = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):
+    if current_user.role != models.RoleEnum.freelancer:
+        raise HTTPException(status_code=403, detail="Only freelancers can create services")
+    return crud.create_service(db, service, current_user.id)
+
+@router.get("/", response_model=List[schemas.ServiceResponse])
+def list_services(db: Session = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):
+    return crud.get_services(db)

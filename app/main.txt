@@ -1,0 +1,18 @@
+from fastapi import FastAPI
+from . import models, database
+from .routes import users, services, auth_routes, contracts, messages
+
+models.Base.metadata.create_all(bind=database.engine)
+
+app = FastAPI(title="Maoki API")
+
+# Rotas
+app.include_router(auth_routes.router)
+app.include_router(users.router)
+app.include_router(services.router)
+app.include_router(contracts.router)
+app.include_router(messages.router)
+
+@app.get("/")
+def root():
+    return {"message": "🚀 Bem-vindo ao Maoki API!"}
