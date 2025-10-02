@@ -1,45 +1,78 @@
-OQUE TEMOS:
+✅ Funcionalidades já prontas
+🔐 Autenticação e Usuários
 
-Funcionalidades imPlementadas
+Registro de usuário com hash de senha (bcrypt).
 
-Usuários:
-- Cadastro de usuários (post/users/)
-- Listagem de usuário (GET /users/)
-- Cada usuário possui:
-- email
-- password
-- role -> cliente ou freelancer
+Login com JWT Tokens (acesso + refresh).
 
+Papéis (roles): cliente e freelancer.
 
-Autenticação (JWT)
+Middleware de segurança: endpoints podem exigir autenticação.
 
-- End point de login (POST /token) na rota auth_routes 
-- geração de token  JWT com validade de 60 minutos
-- autenticação de dois fatores (OAuth2)
-- Endpoint protegido via Depends (Auth.get_current_users) para operações que precisam do usuário logado
+CRUD de usuários: listar, buscar por ID, atualizar perfil, deletar.
 
+💼 Serviços
 
-Serviços
+Freelancer pode criar serviços.
 
-- Endpoint de criação de serviço
-- SOMENTE freelancers podem criar serviços
-- Campos: título e descrição 
-- Endpoint de listagem de servições (Qualquer usuário pode visualizar isso
+Cliente pode listar serviços disponíveis.
 
+Filtro básico por categoria.
 
+Edição e exclusão de serviços (apenas pelo dono).
 
-Banco de dados
+📑 Contratos
 
-- SQLite (maoki.db)
-- Tabelas:
-- -users > armazena e-mail, senha e rol
-- -services > Armazena título, descrição e dono (owner_ id)
-- criação automática das tabelas na inicialização do app
+Cliente pode criar contrato com um freelancer baseado em um serviço.
 
+Status do contrato: pending, in_progress, completed, cancelled.
 
-Segurança do maoki
+Funções para atualizar status (ex: cliente aceita, freelancer conclui).
 
-- Senhas criotografadas com bcrypt
-- Tokens JWT com python-jose
-- Verificação de role antes de criar serviços 
-- Endpoints protegidos para operações sensíveis
+Sistema de avaliação (review + rating) depois de concluído.
+
+Listagem de contratos por status.
+
+📊 Banco de Dados
+
+Modelagem com SQLAlchemy.
+
+Relacionamentos:
+
+Usuário ↔ Serviços (1 para muitos).
+
+Cliente ↔ Freelancer ↔ Contratos (muitos-para-muitos mediado por contrato).
+
+⚙️ Outros pontos
+
+requirements.txt com tudo organizado (FastAPI, SQLAlchemy, PyJWT, etc).
+
+start.bat pra rodar fácil no Windows.
+
+Swagger UI pronto em http://127.0.0.1:8000/docs para testar todos os endpoints.
+
+🚀 O que já conseguimos fazer na prática
+
+Criar conta de cliente e freelancer.
+
+Fazer login e pegar token JWT.
+
+Freelancer cadastrar serviços.
+
+Cliente buscar serviços e contratar um freelancer.
+
+Gerenciar o contrato (status).
+
+Cliente avaliar freelancer depois que o contrato termina.
+
+📌 Próximos Passos (opções que podemos seguir)
+
+Gerenciamento de pagamentos (simular Pix/Cartão, mesmo que só no back).
+
+Chat em tempo real entre cliente e freelancer (WebSockets).
+
+Notificações (quando contrato muda de status).
+
+Dashboard (estatísticas: contratos ativos, ganhos do freelancer, etc).
+
+Deploy (colocar o app rodando em nuvem — Render, Railway, ou AWS).
